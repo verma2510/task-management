@@ -13,9 +13,21 @@ export const AuthProvider = ({ children }) => {
         // Check local storage
         const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user'); // Storing simplified user info
-        if (token && storedUser) {
-            setUser(JSON.parse(storedUser));
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        if (token && storedUser && storedUser !== "undefined") {
+            try {
+                setUser(JSON.parse(storedUser));
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } catch (e) {
+                console.error("Failed to parse user from local storage", e);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        } else {
+            // Clean up if something is invalid
+            if (storedUser === "undefined") {
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
@@ -25,12 +37,16 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post('/api/auth/login', { email, password });
             const { token, user } = res.data;
 
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+            if (token && user) {
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
 
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            setUser(user);
-            return { success: true };
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                setUser(user);
+                return { success: true };
+            } else {
+                return { success: false, error: 'Invalid response from server' };
+            }
         } catch (err) {
             console.error(err);
             return { success: false, error: err.response?.data?.error || 'Login failed' };
