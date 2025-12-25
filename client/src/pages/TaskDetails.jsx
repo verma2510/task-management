@@ -75,7 +75,7 @@ const TaskDetails = () => {
             <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
                 <h1>{task.title}</h1>
                 <p>{task.description}</p>
-                <div className="mt-4 text-muted">Deadline: {new Date(task.deadline).toDateString()}</div>
+                <div className="mt-4 text-muted">Deadline: {new Date(task.deadline).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
             </div>
 
             {/* Student View */}
@@ -84,7 +84,14 @@ const TaskDetails = () => {
                     <h2>Submit Work</h2>
                     {submissions.length > 0 ? (
                         <div className="alert">
-                            <p>You have submitted this task.</p>
+                            <p>
+                                You have submitted this task.
+                                {new Date(submissions[0].submittedAt) > new Date(task.deadline) && (
+                                    <span className="text-danger" style={{ fontWeight: 'bold', marginLeft: '0.5rem' }}>
+                                        (Late Submission)
+                                    </span>
+                                )}
+                            </p>
                             {submissions[0].grade && (
                                 <div className="mt-4">
                                     <strong>Grade:</strong> {submissions[0].grade} <br />
@@ -113,7 +120,14 @@ const TaskDetails = () => {
                             {submissions.map(sub => (
                                 <div key={sub._id} className="card">
                                     <h4>Student: {sub.student.username}</h4>
-                                    <p>Submitted: {new Date(sub.submittedAt).toLocaleString()}</p>
+                                    <p>
+                                        Submitted: {new Date(sub.submittedAt).toLocaleString()}
+                                        {new Date(sub.submittedAt) > new Date(task.deadline) && (
+                                            <span className="text-danger" style={{ fontWeight: 'bold', marginLeft: '0.5rem' }}>
+                                                (Late Submission)
+                                            </span>
+                                        )}
+                                    </p>
                                     {/* Link to image - note: requires server static serving of uploads */}
                                     <a href={`http://localhost:5000/${sub.imagePath.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary mb-4" style={{ display: 'inline-block' }}>View Image</a>
 

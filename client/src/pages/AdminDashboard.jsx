@@ -55,12 +55,24 @@ const AdminDashboard = () => {
         try {
             await axios.post('/api/tasks', {
                 ...formData,
-                assignedStudents: [formData.assignedStudents] // sending ID directly if possible
+                deadline: new Date(formData.deadline), // Convert to proper date object (handling timezone)
+                assignedStudents: [formData.assignedStudents]
             });
             setShowCreate(false);
             fetchTasks();
         } catch (err) {
             alert('Failed to create task');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this task?')) return;
+        try {
+            await axios.delete(`/api/tasks/${id}`);
+            setTasks(tasks.filter(task => task._id !== id));
+        } catch (err) {
+            console.error(err);
+            alert('Failed to delete task');
         }
     };
 
@@ -87,7 +99,7 @@ const AdminDashboard = () => {
                         </div>
                         <div className="form-group">
                             <label>Deadline</label>
-                            <input type="date" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} required />
+                            <input type="datetime-local" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} required />
                         </div>
                         <div className="form-group">
                             <label>Assign To (Student)</label>
@@ -116,8 +128,11 @@ const AdminDashboard = () => {
                         <h3>{task.title}</h3>
                         <p className="text-muted">{task.description}</p>
                         <div className="flex-between mt-4">
-                            <small>Deadline: {new Date(task.deadline).toLocaleDateString()}</small>
-                            <Link to={`/task/${task._id}`} className="btn btn-primary">View Details</Link>
+                            <small>Deadline: {new Date(task.deadline).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</small>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <Link to={`/task/${task._id}`} className="btn btn-primary">View</Link>
+                                <button onClick={() => handleDelete(task._id)} className="btn btn-danger">Delete</button>
+                            </div>
                         </div>
                     </div>
                 ))}

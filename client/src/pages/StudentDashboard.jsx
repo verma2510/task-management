@@ -33,7 +33,7 @@ const StudentDashboard = () => {
                             <p className="text-muted">{task.description}</p>
                             <div className="flex-between mt-4">
                                 <span className={new Date(task.deadline) < new Date() ? 'text-danger' : 'text-success'}>
-                                    Due: {new Date(task.deadline).toLocaleDateString()}
+                                    Due: {new Date(task.deadline).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                 </span>
                                 <Link to={`/task/${task._id}`} className="btn btn-primary">View & Submit</Link>
                             </div>
