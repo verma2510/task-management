@@ -6,6 +6,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import TaskDetails from './pages/TaskDetails';
 import Navbar from './components/Navbar';
+import SyllabusView from './components/SyllabusView';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, role }) => {
@@ -53,6 +54,14 @@ function App() {
                         <ProtectedRoute role="student">
                             <Layout>
                                 <StudentDashboard />
+                            </Layout>
+                        </ProtectedRoute>
+                    } />
+
+                    <Route path="/syllabus-view" element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <SyllabusView />
                             </Layout>
                         </ProtectedRoute>
                     } />

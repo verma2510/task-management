@@ -29,11 +29,13 @@ const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const submissionRoutes = require('./routes/submissions');
 const userRoutes = require('./routes/users');
+const syllabusRoutes = require('./routes/syllabus');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/syllabus', syllabusRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
