@@ -129,7 +129,7 @@ const TaskDetails = () => {
                                         )}
                                     </p>
                                     {/* Link to image - note: requires server static serving of uploads */}
-                                    <a href={`http://localhost:5000/${sub.imagePath.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary mb-4" style={{ display: 'inline-block' }}>View Image</a>
+                                    <a href={`${import.meta.env.VITE_API_URL}/${sub.imagePath.replace(/\\/g, '/')}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary mb-4" style={{ display: 'inline-block' }}>View Image</a>
 
                                     <div className="form-group border-top pt-4" style={{ borderTop: '1px solid var(--border)' }}>
                                         <label>Grade</label>

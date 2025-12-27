@@ -10,10 +10,34 @@ const AdminDashboard = () => {
     const [showCreate, setShowCreate] = useState(false);
 
     // Create Task Form State
-    const [formData, setFormData] = useState({ title: '', description: '', deadline: '', assignedStudents: '' });
+    const [formData, setFormData] = useState({ title: '', description: '', deadline: '', assignedStudents: '', lessonNumber: '', subject: '' });
     // Note: For simplicity, assignedStudents is textual or we fetch users.
     // To make it robust, we should fetch students to select from.
     const [students, setStudents] = useState([]);
+    const [studentSyllabus, setStudentSyllabus] = useState(null);
+
+    // Fetch syllabus when student is selected
+    useEffect(() => {
+        if (formData.assignedStudents) {
+            const fetchStudentSyllabus = async () => {
+                try {
+                    const res = await axios.get(`/api/syllabus/${formData.assignedStudents}`);
+                    setStudentSyllabus(res.data);
+                } catch (err) {
+                    console.error("Failed to fetch syllabus", err);
+                    setStudentSyllabus(null);
+                }
+            };
+            fetchStudentSyllabus();
+        } else {
+            setStudentSyllabus(null);
+        }
+    }, [formData.assignedStudents]);
+
+    // Derived lists
+    const subjects = studentSyllabus?.subjects || [];
+    const selectedSubjectData = subjects.find(s => s.name === formData.subject);
+    const lessons = selectedSubjectData?.lessons || [];
 
     useEffect(() => {
         fetchTasks();
@@ -113,23 +137,11 @@ const AdminDashboard = () => {
                             <h3>Create Task</h3>
                             <form onSubmit={handleCreate}>
                                 <div className="form-group">
-                                    <label>Title</label>
-                                    <input value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required />
-                                </div>
-                                <div className="form-group">
-                                    <label>Description</label>
-                                    <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required />
-                                </div>
-                                <div className="form-group">
-                                    <label>Deadline</label>
-                                    <input type="datetime-local" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} required />
-                                </div>
-                                <div className="form-group">
                                     <label>Assign To (Student)</label>
                                     <select
                                         className="form-control"
                                         value={formData.assignedStudents}
-                                        onChange={e => setFormData({ ...formData, assignedStudents: e.target.value })}
+                                        onChange={e => setFormData({ ...formData, assignedStudents: e.target.value, subject: '', lessonNumber: '' })}
                                         required
                                     >
                                         <option value="">Select a student</option>
@@ -139,6 +151,49 @@ const AdminDashboard = () => {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Subject (Links to Syllabus)</label>
+                                    <select
+                                        className="form-control"
+                                        value={formData.subject}
+                                        onChange={e => setFormData({ ...formData, subject: e.target.value, lessonNumber: '' })}
+                                        disabled={!studentSyllabus}
+                                    >
+                                        <option value="">Select Subject</option>
+                                        {subjects.map((sub, i) => (
+                                            <option key={i} value={sub.name}>{sub.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Lesson (Links to Syllabus)</label>
+                                    <select
+                                        className="form-control"
+                                        value={formData.lessonNumber}
+                                        onChange={e => setFormData({ ...formData, lessonNumber: e.target.value })}
+                                        disabled={!formData.subject}
+                                    >
+                                        <option value="">Select Lesson</option>
+                                        {lessons.map((lesson, i) => (
+                                            <option key={i} value={lesson.number}>
+                                                #{lesson.number} - {lesson.name} {lesson.completed ? '(Completed)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {/* Optional Title Override */}
+                                <div className="form-group">
+                                    <label>Title (Optional - Auto-generated from Subject/Lesson if empty)</label>
+                                    <input value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="e.g. Complete Algebra Exercises" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Description</label>
+                                    <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Deadline</label>
+                                    <input type="datetime-local" value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} required />
                                 </div>
                                 <button className="btn btn-primary">Publish Task</button>
                             </form>

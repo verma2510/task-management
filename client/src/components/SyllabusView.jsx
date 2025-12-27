@@ -79,13 +79,19 @@ const SyllabusView = ({ syllabus: propSyllabus }) => {
                                         display: 'flex',
                                         gap: '1rem',
                                         alignItems: 'center',
-                                        background: 'rgba(255,255,255,0.02)',
-                                        borderRadius: '6px'
+                                        background: lesson.completed ? 'rgba(74, 222, 128, 0.1)' : 'rgba(255,255,255,0.02)',
+                                        borderRadius: '6px',
+                                        border: lesson.completed ? '1px solid rgba(74, 222, 128, 0.3)' : 'none'
                                     }}>
                                         <span className="text-muted" style={{ fontWeight: 'bold', minWidth: '40px', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px 0' }}>
                                             #{lesson.number}
                                         </span>
                                         <span style={{ fontSize: '1.05rem' }}>{lesson.name}</span>
+                                        {lesson.completed && (
+                                            <span style={{ marginLeft: 'auto', color: '#4ade80', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                                ✓ Completed
+                                            </span>
+                                        )}
                                     </div>
                                 ))}
                             </div>

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const lessonSchema = new mongoose.Schema({
     number: { type: Number, required: true },
-    name: { type: String, required: true }
+    name: { type: String, required: true },
+    completed: { type: Boolean, default: false }
 });
 
 const subjectSchema = new mongoose.Schema({
